@@ -142,7 +142,7 @@
                 <p class="text-sm text-slate-400 mt-2">Zamonaviy va ishonchli elektronika buyumlari do'koni.</p>
             </div>
             <div class="text-sm text-slate-400 md:text-center">
-                <p>Aloqa: info@minimalstore.uz | Tel: +998 (71) 123-45-67</p>
+                <p>Aloqa: info@minimalstore.uz | Tel: +998 (77) 502-75-99</p>
             </div>
             <div class="flex md:justify-end gap-4 text-slate-400">
                 <a href="#" class="hover:text-cyan-400 transition-colors">Telegram</a>
@@ -167,7 +167,6 @@
             { id: 6, name: "4K Ultra HD Kameraning Linzasi", price: 4500000, rating: 5.0, category: "smart", image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&q=80" }
         ];
 
-        // localStorage'dan savatchani o'qib olish
         let cart = JSON.parse(localStorage.getItem('minimalStoreCart')) || [];
         let currentCategory = 'all';
 
@@ -212,11 +211,9 @@
             });
         }
 
-        // Kategoriya bo'yicha filter
         function filterCategory(category) {
             currentCategory = category;
             
-            // Tugmalar rangini o'zgartirish
             document.querySelectorAll('.cat-btn').forEach(btn => {
                 btn.className = "cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition-all";
             });
@@ -225,7 +222,6 @@
             applyFilters();
         }
 
-        // Qidiruv va kategoriyani birlashtirib filterlash
         function applyFilters() {
             const query = document.getElementById('searchInput').value.toLowerCase();
             let filtered = products;
@@ -342,7 +338,6 @@
             toggleCart();
         }
 
-        // Ilk yuklanish
         renderProducts(products);
         updateCartUI();
     </script>
