@@ -1,91 +1,105 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="uz" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MinimalStore - Onlayn Do'kon</title>
+    <title>MinimalStore - Zamonaviy Onlayn Do'kon</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
         }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-cyan-500 selection:text-slate-950">
 
+    <!-- Toast Notification (Xabar oynasi) -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 border border-cyan-500/30 text-slate-100 px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3">
+        <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></div>
+        <span id="toastMessage" class="text-sm font-medium">Mahsulot savatchaga qo'shildi!</span>
+    </div>
+
     <!-- Header (Yuqori qism) -->
     <header class="sticky top-0 z-40 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4">
             <!-- Logotip -->
-            <a href="#" class="text-xl font-bold tracking-tight text-cyan-400 flex items-center gap-2">
-                <span class="w-8 h-8 rounded-lg bg-cyan-500 flex items-center justify-center text-slate-950 font-extrabold">M</span>
+            <a href="#" class="text-xl font-extrabold tracking-tight text-cyan-400 flex items-center gap-2.5 shrink-0">
+                <span class="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-cyan-500/20">M</span>
                 MinimalStore
             </a>
 
             <!-- Qidiruv paneli -->
-            <div class="hidden md:flex items-center flex-1 max-w-md mx-8">
+            <div class="flex items-center flex-1 max-w-md mx-2 sm:mx-8">
                 <div class="relative w-full">
-                    <input type="text" id="searchInput" placeholder="Mahsulotlarni qidirish..." oninput="filterProducts()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 pl-11 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:border-cyan-500 transition-colors">
-                    <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <input type="text" id="searchInput" placeholder="Mahsulotlarni qidirish..." oninput="filterProducts()" class="w-full bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-2.5 pl-10 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all">
+                    <svg class="w-4 h-4 text-slate-500 absolute left-3.5 top-3 sm:top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </div>
             </div>
 
-            <!-- Sahifalar havolalari va Savatcha -->
-            <div class="flex items-center gap-6">
-                <nav class="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
-                    <a href="#hero" class="hover:text-cyan-400 transition-colors">Bosh sahifa</a>
-                    <a href="#products" class="hover:text-cyan-400 transition-colors">Katalog</a>
-                    <a href="#footer" class="hover:text-cyan-400 transition-colors">Aloqa</a>
-                </nav>
-
-                <!-- Savatcha tugmasi -->
-                <button onclick="toggleCart()" class="relative bg-slate-800 hover:bg-slate-700 border border-slate-700 p-2.5 rounded-xl flex items-center gap-2.5 transition-all group">
+            <!-- Savatcha Tugmasi -->
+            <div class="flex items-center gap-4 shrink-0">
+                <button onclick="toggleCart()" class="relative bg-slate-900 hover:bg-slate-800 border border-slate-800 p-3 rounded-2xl flex items-center gap-2.5 transition-all group shadow-sm">
                     <svg class="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                     </svg>
                     <span class="text-sm font-semibold pr-1 hidden sm:inline" id="cartTotalSum">0 so'm</span>
-                    <!-- Mahsulotlar soni badji -->
-                    <span id="cartCount" class="absolute -top-2 -right-2 bg-cyan-500 text-slate-950 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-lg">0</span>
+                    <span id="cartCount" class="absolute -top-2 -right-2 bg-cyan-500 text-slate-950 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-lg shadow-cyan-500/40">0</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- Hero Section (Asosiy banner) -->
-    <section id="hero" class="relative overflow-hidden py-24 sm:py-32 bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800/60">
+    <section id="hero" class="relative overflow-hidden py-20 sm:py-28 bg-gradient-to-b from-slate-900 via-slate-950 to-slate-950 border-b border-slate-800/60">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-900/20 via-transparent to-transparent pointer-events-none"></div>
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
-            <span class="inline-block bg-cyan-500/10 text-cyan-400 text-xs font-semibold px-3 py-1 rounded-full mb-6 border border-cyan-500/20">Yangi 2026 Kolleksiyasi</span>
-            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-50 mb-6 max-w-3xl mx-auto">
-                Kelajak texnologiyalari <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">sizning qo'lingizda</span>
+            <span class="inline-flex items-center gap-2 bg-cyan-500/10 text-cyan-400 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 border border-cyan-500/20 shadow-inner">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span> Yangi 2026 Kolleksiyasi
+            </span>
+            <h1 class="text-3xl sm:text-6xl font-extrabold tracking-tight text-slate-50 mb-6 max-w-3xl mx-auto leading-tight">
+                Kelajak texnologiyalari <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-400 to-blue-500">sizning qo'lingizda</span>
             </h1>
-            <p class="text-lg text-slate-400 mb-10 max-w-xl mx-auto">
-                Eng zamonaviy dizayn va yuqori sifatli gadjetlarni eng qulay narxlarda xarid qiling. Cheklangan takliflarni qo'ldan boy bermang.
+            <p class="text-sm sm:text-lg text-slate-400 mb-10 max-w-xl mx-auto leading-relaxed">
+                Eng zamonaviy dizayn va yuqori sifatli gadjetlarni eng qulay narxlarda xarid qiling. Tez yetkazib berish va rasmiy kafolat bilan.
             </p>
-            <a href="#products" class="inline-flex items-center justify-center bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-8 py-4 rounded-xl shadow-lg shadow-cyan-500/20 transition-all transform hover:-translate-y-0.5">
-                Hozir xarid qilish
+            <a href="#products" class="inline-flex items-center justify-center bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold px-8 py-4 rounded-2xl shadow-xl shadow-cyan-500/20 transition-all transform hover:-translate-y-0.5">
+                Xaridni boshlash
             </a>
         </div>
     </section>
 
     <!-- Mahsulotlar katalogi (Products Grid) -->
-    <main id="products" class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 w-full">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+    <main id="products" class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 w-full">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
             <div>
-                <h2 class="text-2xl font-bold tracking-tight">Ommabop Mahsulotlar</h2>
-                <p class="text-sm text-slate-400 mt-1">Siz uchun saralangan eng yaxshi takliflar</p>
+                <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-100">Ommabop Mahsulotlar</h2>
+                <p class="text-sm text-slate-400 mt-1">Siz uchun maxsus tanlangan eng sara takliflar</p>
             </div>
             
             <!-- Kategoriyalar bo'yicha filtrlar -->
             <div class="flex flex-wrap gap-2" id="categoryFilters">
-                <button onclick="filterCategory('all')" class="cat-btn bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl transition-all">Barchasi</button>
-                <button onclick="filterCategory('audio')" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition-all">Audio</button>
-                <button onclick="filterCategory('smart')" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition-all">Smart qurilmalar</button>
-                <button onclick="filterCategory('accessories')" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition-all">Aksessuarlar</button>
+                <button onclick="filterCategory('all')" class="cat-btn bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-cyan-500/10">Barchasi</button>
+                <button onclick="filterCategory('audio')" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all">Audio</button>
+                <button onclick="filterCategory('smart')" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all">Smart qurilmalar</button>
+                <button onclick="filterCategory('accessories')" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all">Aksessuarlar</button>
             </div>
         </div>
 
@@ -95,38 +109,29 @@
         </div>
     </main>
 
-    <!-- Savatcha Yon Paneli (Drawer / Modal) -->
+    <!-- Savatcha Yon Paneli (Drawer) -->
     <div id="cartDrawer" class="fixed inset-0 z-50 overflow-hidden hidden">
-        <!-- Fon soyasi -->
         <div class="absolute inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity" onclick="toggleCart()"></div>
-
         <div class="absolute inset-y-0 right-0 max-w-full flex pl-10">
             <div class="w-screen max-w-md bg-slate-900 border-l border-slate-800 flex flex-col shadow-2xl">
-                <!-- Sarlavha -->
                 <div class="p-6 border-b border-slate-800 flex items-center justify-between">
                     <h3 class="text-lg font-bold flex items-center gap-2">
                         Savatcha
-                        <span id="drawerItemCount" class="bg-slate-800 text-cyan-400 text-xs px-2.5 py-1 rounded-full">0 ta</span>
+                        <span id="drawerItemCount" class="bg-slate-800 text-cyan-400 text-xs px-2.5 py-1 rounded-full font-semibold">0 ta</span>
                     </h3>
-                    <button onclick="toggleCart()" class="text-slate-400 hover:text-slate-100 p-1">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
+                    <button onclick="toggleCart()" class="text-slate-400 hover:text-slate-100 p-2 rounded-xl hover:bg-slate-800 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
-
-                <!-- Mahsulotlar ro'yxati -->
                 <div id="cartItemsContainer" class="flex-1 overflow-y-auto p-6 space-y-4 divide-y divide-slate-800/60">
-                    <!-- Savatcha bo'sh holati -->
+                    <!-- Savatcha buyumlari -->
                 </div>
-
-                <!-- Hisob-kitob va tugma -->
                 <div class="p-6 border-t border-slate-800 bg-slate-900/50">
                     <div class="flex justify-between items-center mb-4 text-base">
                         <span class="text-slate-400">Jami summa:</span>
-                        <span id="drawerTotalSum" class="font-bold text-lg text-cyan-400">0 so'm</span>
+                        <span id="drawerTotalSum" class="font-extrabold text-lg text-cyan-400">0 so'm</span>
                     </div>
-                    <button onclick="checkout()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all">
+                    <button onclick="openCheckoutModal()" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-4 rounded-2xl shadow-xl shadow-cyan-500/20 transition-all">
                         Buyurtmani rasmiylashtirish
                     </button>
                 </div>
@@ -134,7 +139,38 @@
         </div>
     </div>
 
-    <!-- Footer (Pastki qism) -->
+    <!-- Buyurtma berish oynasi (Checkout Modal) -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl relative">
+            <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-100">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <h3 class="text-xl font-bold mb-1 text-slate-100">Buyurtma berish</h3>
+            <p class="text-xs text-slate-400 mb-6">Ma'lumotlaringizni kiriting, operatorlarimiz tez orada bog'lanishadi.</p>
+            
+            <form onsubmit="submitOrder(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">F.I.Sh (Ismingiz)</label>
+                    <input type="text" id="custName" required placeholder="Masalan: Asqar Kamaladdinov" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Telefon raqamingiz</label>
+                    <input type="tel" id="custPhone" required placeholder="+998 90 123 45 67" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-cyan-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">Yetkazib berish manzili</label>
+                    <textarea id="custAddress" rows="2" required placeholder="Shahar, tuman, ko'cha..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-cyan-500"></textarea>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all">
+                        Buyurtmani tasdiqlash
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer id="footer" class="bg-slate-900 border-t border-slate-800 py-12 mt-20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
             <div>
@@ -142,9 +178,10 @@
                 <p class="text-sm text-slate-400 mt-2">Zamonaviy va ishonchli elektronika buyumlari do'koni.</p>
             </div>
             <div class="text-sm text-slate-400 md:text-center">
-                <p>Aloqa: asqarkamaladdinov@gmail.com | Tel: +998 (77) 502-75-99</p>
+                <p>Aloqa: asqarkamaladdinov@gmail.com</p>
+                <p class="mt-1">Tel: +998 (77) 502-75-99</p>
             </div>
-            <div class="flex md:justify-end gap-4 text-slate-400">
+            <div class="flex md:justify-end gap-6 text-sm font-medium text-slate-400">
                 <a href="#" class="hover:text-cyan-400 transition-colors">Telegram</a>
                 <a href="#" class="hover:text-cyan-400 transition-colors">Instagram</a>
                 <a href="#" class="hover:text-cyan-400 transition-colors">YouTube</a>
@@ -155,9 +192,8 @@
         </div>
     </footer>
 
-    <!-- JavaScript Interaktivlik -->
+    <!-- JavaScript Mantiq -->
     <script>
-        // Mahsulotlar bazasi (kategoriyalar bilan)
         const products = [
             { id: 1, name: "Wireless Studio Pro Naushnik", price: 1250000, rating: 4.8, category: "audio", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80" },
             { id: 2, name: "Smart Watch Series 9 Ultra", price: 2400000, rating: 4.9, category: "smart", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" },
@@ -168,10 +204,32 @@
         ];
 
         let cart = JSON.parse(localStorage.getItem('minimalStoreCart')) || [];
+        let wishlist = JSON.parse(localStorage.getItem('minimalStoreWishlist')) || [];
         let currentCategory = 'all';
 
         function formatPrice(price) {
             return price.toLocaleString('uz-UZ') + " so'm";
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        function toggleWishlist(productId) {
+            if (wishlist.includes(productId)) {
+                wishlist = wishlist.filter(id => id !== productId);
+                showToast("Mahsulot yoqtirilganlardan olib tashlandi.");
+            } else {
+                wishlist.push(productId);
+                showToast("Mahsulot yoqtirilganlarga qo'shildi! ❤️");
+            }
+            localStorage.setItem('minimalStoreWishlist', JSON.stringify(wishlist));
+            applyFilters();
         }
 
         function renderProducts(items) {
@@ -179,30 +237,34 @@
             grid.innerHTML = '';
 
             if (items.length === 0) {
-                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-12">Hech qanday mahsulot topilmadi.</p>`;
+                grid.innerHTML = `<p class="col-span-full text-center text-slate-500 py-16 text-sm">Hech qanday mahsulot topilmadi.</p>`;
                 return;
             }
 
             items.forEach(product => {
+                const isLiked = wishlist.includes(product.id);
                 grid.innerHTML += `
-                    <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-cyan-500/50 transition-all duration-300 group flex flex-col justify-between shadow-xl">
+                    <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden hover:border-cyan-500/50 transition-all duration-300 group flex flex-col justify-between shadow-xl">
                         <div>
-                            <div class="relative overflow-hidden bg-slate-950 h-56 flex items-center justify-center">
+                            <div class="relative overflow-hidden bg-slate-950 h-60 flex items-center justify-center">
                                 <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90">
-                                <div class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-lg text-xs font-bold text-amber-400 flex items-center gap-1 border border-slate-700">
+                                
+                                <button onclick="toggleWishlist(${product.id})" class="absolute top-4 left-4 p-2 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700 text-slate-300 hover:text-red-500 transition-colors">
+                                    <svg class="w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                                </button>
+
+                                <div class="absolute top-4 right-4 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs font-bold text-amber-400 flex items-center gap-1 border border-slate-700/80 shadow-lg">
                                     ★ ${product.rating}
                                 </div>
                             </div>
-                            <div class="p-5">
+                            <div class="p-6">
                                 <h3 class="font-bold text-base text-slate-100 mb-2 line-clamp-1">${product.name}</h3>
                                 <div class="text-cyan-400 font-extrabold text-lg">${formatPrice(product.price)}</div>
                             </div>
                         </div>
-                        <div class="p-5 pt-0">
-                            <button onclick="addToCart(${product.id})" class="w-full bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-slate-100 text-sm font-semibold py-3 rounded-xl border border-slate-700 hover:border-cyan-500 transition-all flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                </svg>
+                        <div class="p-6 pt-0">
+                            <button onclick="addToCart(${product.id})" class="w-full bg-slate-800 hover:bg-cyan-500 hover:text-slate-950 text-slate-100 text-sm font-semibold py-3.5 rounded-2xl border border-slate-700 hover:border-cyan-500 transition-all flex items-center justify-center gap-2 shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
                                 Savatchaga qo'shish
                             </button>
                         </div>
@@ -213,12 +275,10 @@
 
         function filterCategory(category) {
             currentCategory = category;
-            
             document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.className = "cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2 rounded-xl transition-all";
+                btn.className = "cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all";
             });
-            event.target.className = "cat-btn bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2 rounded-xl transition-all";
-
+            event.target.className = "cat-btn bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-cyan-500/10";
             applyFilters();
         }
 
@@ -229,7 +289,6 @@
             if (currentCategory !== 'all') {
                 filtered = filtered.filter(p => p.category === currentCategory);
             }
-
             if (query) {
                 filtered = filtered.filter(p => p.name.toLowerCase().includes(query));
             }
@@ -252,10 +311,7 @@
             }
 
             saveAndSyncCart();
-            
-            const cartBtn = document.querySelector('button[onclick="toggleCart()"]');
-            cartBtn.classList.add('scale-105', 'border-cyan-400');
-            setTimeout(() => cartBtn.classList.remove('scale-105', 'border-cyan-400'), 200);
+            showToast(`${product.name} savatchaga qo'shildi!`);
         }
 
         function changeQuantity(productId, delta) {
@@ -288,10 +344,8 @@
             if (cart.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-20 text-slate-500">
-                        <svg class="w-16 h-16 mx-auto mb-4 stroke-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
-                        </svg>
-                        <p class="text-base font-medium">Savatchangiz hozircha bo'sh</p>
+                        <svg class="w-16 h-16 mx-auto mb-4 stroke-1 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                        <p class="text-sm font-medium">Savatchangiz hozircha bo'sh</p>
                     </div>
                 `;
                 return;
@@ -301,20 +355,18 @@
             cart.forEach(item => {
                 container.innerHTML += `
                     <div class="pt-4 first:pt-0 flex items-center justify-between gap-4">
-                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-xl border border-slate-800">
+                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-2xl border border-slate-800">
                         <div class="flex-1 min-w-0">
                             <h4 class="text-sm font-bold text-slate-100 truncate">${item.name}</h4>
                             <div class="text-xs text-cyan-400 font-semibold mt-0.5">${formatPrice(item.price)}</div>
-                            <div class="flex items-center gap-2 mt-2">
-                                <button onclick="changeQuantity(${item.id}, -1)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-xs font-bold">-</button>
+                            <div class="flex items-center gap-2.5 mt-2">
+                                <button onclick="changeQuantity(${item.id}, -1)" class="w-7 h-7 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-xs font-bold">-</button>
                                 <span class="text-xs font-bold px-1">${item.quantity}</span>
-                                <button onclick="changeQuantity(${item.id}, 1)" class="w-6 h-6 rounded-lg bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-xs font-bold">+</button>
+                                <button onclick="changeQuantity(${item.id}, 1)" class="w-7 h-7 rounded-xl bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-xs font-bold">+</button>
                             </div>
                         </div>
                         <button onclick="changeQuantity(${item.id}, -${item.quantity})" class="text-slate-500 hover:text-red-400 p-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                            </svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
                 `;
@@ -322,20 +374,34 @@
         }
 
         function toggleCart() {
-            const drawer = document.getElementById('cartDrawer');
-            drawer.classList.toggle('hidden');
+            document.getElementById('cartDrawer').classList.toggle('hidden');
         }
 
-        function checkout() {
+        function openCheckoutModal() {
             if (cart.length === 0) {
                 alert("Savatchangiz bo'sh!");
                 return;
             }
+            toggleCart();
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            const name = document.getElementById('custName').value;
+            const phone = document.getElementById('custPhone').value;
+            const address = document.getElementById('custAddress').value;
             const total = formatPrice(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0));
-            alert(`✅ Buyurtmangiz muvaffaqiyatli qabul qilindi!\n💰 Jami summa: ${total}\nTez orada operatorlarimiz siz bilan bog'lanishadi.`);
+
+            alert(`✅ Rahmat ${name}!\n\nBuyurtmangiz qabul qilindi.\n💰 Umumiy summa: ${total}\n📍 Manzil: ${address}\n\nTez orada ${phone} raqamingizga bog'lanamiz.`);
+
             cart = [];
             saveAndSyncCart();
-            toggleCart();
+            closeCheckoutModal();
         }
 
         renderProducts(products);
@@ -343,3 +409,5 @@
     </script>
 </body>
 </html>
+
+              
