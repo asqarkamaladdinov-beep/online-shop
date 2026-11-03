@@ -54,8 +54,15 @@
                 </div>
             </div>
 
-            <!-- Savatcha Tugmasi -->
-            <div class="flex items-center gap-4 shrink-0">
+            <!-- Sevimlilar va Savatcha Tugmalari -->
+            <div class="flex items-center gap-3 shrink-0">
+                <button onclick="toggleWishlistOnly()" class="relative bg-slate-900 hover:bg-slate-800 border border-slate-800 p-3 rounded-2xl flex items-center gap-2 transition-all group">
+                    <svg class="w-5 h-5 text-red-400 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    <span id="wishlistCount" class="text-xs font-bold bg-red-500/20 text-red-400 px-2 py-0.5 rounded-full">0</span>
+                </button>
+
                 <button onclick="toggleCart()" class="relative bg-slate-900 hover:bg-slate-800 border border-slate-800 p-3 rounded-2xl flex items-center gap-2.5 transition-all group shadow-sm">
                     <svg class="w-5 h-5 text-cyan-400 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
@@ -88,18 +95,28 @@
 
     <!-- Mahsulotlar katalogi (Products Grid) -->
     <main id="products" class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 w-full">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-10 gap-4">
+        <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-4">
             <div>
                 <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-100">Ommabop Mahsulotlar</h2>
                 <p class="text-sm text-slate-400 mt-1">Siz uchun maxsus tanlangan eng sara takliflar</p>
             </div>
             
-            <!-- Kategoriyalar bo'yicha filtrlar -->
-            <div class="flex flex-wrap gap-2" id="categoryFilters">
-                <button onclick="filterCategory('all')" class="cat-btn bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-cyan-500/10">Barchasi</button>
-                <button onclick="filterCategory('audio')" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all">Audio</button>
-                <button onclick="filterCategory('smart')" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all">Smart qurilmalar</button>
-                <button onclick="filterCategory('accessories')" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all">Aksessuarlar</button>
+            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+                <!-- Kategoriyalar bo'yicha filtrlar -->
+                <div class="flex flex-wrap gap-2" id="categoryFilters">
+                    <button onclick="filterCategory('all', this)" class="cat-btn bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-cyan-500/10">Barchasi</button>
+                    <button onclick="filterCategory('audio', this)" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all">Audio</button>
+                    <button onclick="filterCategory('smart', this)" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all">Smart qurilmalar</button>
+                    <button onclick="filterCategory('accessories', this)" class="cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all">Aksessuarlar</button>
+                </div>
+
+                <!-- Saralash (Sort Options) -->
+                <select id="sortSelect" onchange="applyFilters()" class="bg-slate-900 border border-slate-800 text-xs font-semibold text-slate-300 rounded-xl px-3 py-2.5 focus:outline-none focus:border-cyan-500">
+                    <option value="default">Saralash: Standart</option>
+                    <option value="price-asc">Narx: Arzonroq</option>
+                    <option value="price-desc">Narx: Qimmatroq</option>
+                    <option value="rating">Reyting: Yuqori</option>
+                </select>
             </div>
         </div>
 
@@ -108,6 +125,18 @@
             <!-- JS orqali to'ldiriladi -->
         </div>
     </main>
+
+    <!-- Mahsulot haqida batafsil ko'rish Modali (Quick View) -->
+    <div id="productModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 w-full max-w-2xl shadow-2xl relative overflow-hidden">
+            <button onclick="closeProductModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-100">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            <div id="modalContent" class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <!-- Dynamic Content -->
+            </div>
+        </div>
+    </div>
 
     <!-- Savatcha Yon Paneli (Drawer) -->
     <div id="cartDrawer" class="fixed inset-0 z-50 overflow-hidden hidden">
@@ -141,7 +170,7 @@
 
     <!-- Buyurtma berish oynasi (Checkout Modal) -->
     <div id="checkoutModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl relative">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-2xl relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeCheckoutModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-100">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
@@ -161,6 +190,13 @@
                     <label class="block text-xs font-semibold text-slate-400 mb-1">Yetkazib berish manzili</label>
                     <textarea id="custAddress" rows="2" required placeholder="Shahar, tuman, ko'cha..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-cyan-500"></textarea>
                 </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 mb-1">To'lov turi</label>
+                    <select id="paymentType" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 focus:outline-none focus:border-cyan-500">
+                        <option value="Naqd">Naqd pulda (kuryerga)</option>
+                        <option value="Click/Payme">Click / Payme orqali</option>
+                    </select>
+                </div>
                 <div class="pt-2">
                     <button type="submit" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3.5 rounded-xl shadow-lg shadow-cyan-500/20 transition-all">
                         Buyurtmani tasdiqlash
@@ -178,7 +214,7 @@
                 <p class="text-sm text-slate-400 mt-2">Zamonaviy va ishonchli elektronika buyumlari do'koni.</p>
             </div>
             <div class="text-sm text-slate-400 md:text-center">
-                <p>Aloqa: asqarkamaladdinov@gmail.com</p>
+                <p>Aloqa: info@minimalstore.uz</p>
                 <p class="mt-1">Tel: +998 (77) 502-75-99</p>
             </div>
             <div class="flex md:justify-end gap-6 text-sm font-medium text-slate-400">
@@ -195,17 +231,18 @@
     <!-- JavaScript Mantiq -->
     <script>
         const products = [
-            { id: 1, name: "Wireless Studio Pro Naushnik", price: 1250000, rating: 4.8, category: "audio", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80" },
-            { id: 2, name: "Smart Watch Series 9 Ultra", price: 2400000, rating: 4.9, category: "smart", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" },
-            { id: 3, name: "Minimalist Mexanik Klaviatura", price: 980000, rating: 4.7, category: "accessories", image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&q=80" },
-            { id: 4, name: "Portativ Bluetooth Kalonka", price: 650000, rating: 4.6, category: "audio", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500&q=80" },
-            { id: 5, name: "Ergonomik Simsiz Sichqoncha", price: 420000, rating: 4.9, category: "accessories", image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" },
-            { id: 6, name: "4K Ultra HD Kameraning Linzasi", price: 4500000, rating: 5.0, category: "smart", image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&q=80" }
+            { id: 1, name: "Wireless Studio Pro Naushnik", price: 1250000, rating: 4.8, category: "audio", desc: "Studio sifatidagi tiniq ovoz va faol shovqinni bekor qilish (ANC) tizimiga ega naushnik.", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80" },
+            { id: 2, name: "Smart Watch Series 9 Ultra", price: 2400000, rating: 4.9, category: "smart", desc: "Suvga chidamli titanium korpus va salomatlik ko'rsatkichlarini doimiy monitoring qiluvchi aqlli soat.", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80" },
+            { id: 3, name: "Minimalist Mexanik Klaviatura", price: 980000, rating: 4.7, category: "accessories", desc: "RGB yoritgichli va mexanik tugmali simsiz zamonaviy klaviatura.", image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&q=80" },
+            { id: 4, name: "Portativ Bluetooth Kalonka", price: 650000, rating: 4.6, category: "audio", desc: "12 soatlik batareya quvvati va kuchli bas ovoziga ega Ixcham dinamik.", image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500&q=80" },
+            { id: 5, name: "Ergonomik Simsiz Sichqoncha", price: 420000, rating: 4.9, category: "accessories", desc: "Qo'l toliqishining oldini oluvchi va uzoq vaqt ishlashga mo'ljallangan qulay sichqoncha.", image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80" },
+            { id: 6, name: "4K Ultra HD Kameraning Linzasi", price: 4500000, rating: 5.0, category: "smart", desc: "Professional darajadagi suratlar va 4K videolarni tasvirga olish linzasi.", image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=500&q=80" }
         ];
 
         let cart = JSON.parse(localStorage.getItem('minimalStoreCart')) || [];
         let wishlist = JSON.parse(localStorage.getItem('minimalStoreWishlist')) || [];
         let currentCategory = 'all';
+        let showOnlyWishlist = false;
 
         function formatPrice(price) {
             return price.toLocaleString('uz-UZ') + " so'm";
@@ -220,6 +257,10 @@
             }, 2500);
         }
 
+        function updateWishlistUI() {
+            document.getElementById('wishlistCount').innerText = wishlist.length;
+        }
+
         function toggleWishlist(productId) {
             if (wishlist.includes(productId)) {
                 wishlist = wishlist.filter(id => id !== productId);
@@ -229,7 +270,39 @@
                 showToast("Mahsulot yoqtirilganlarga qo'shildi! ❤️");
             }
             localStorage.setItem('minimalStoreWishlist', JSON.stringify(wishlist));
+            updateWishlistUI();
             applyFilters();
+        }
+
+        function toggleWishlistOnly() {
+            showOnlyWishlist = !showOnlyWishlist;
+            applyFilters();
+        }
+
+        function openProductModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const modalContent = document.getElementById('modalContent');
+            modalContent.innerHTML = `
+                <div class="h-64 bg-slate-950 rounded-2xl overflow-hidden flex items-center justify-center">
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <span class="text-xs font-semibold uppercase text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-md border border-cyan-500/20">${product.category}</span>
+                    <h3 class="text-xl font-bold text-slate-100 mt-2 mb-2">${product.name}</h3>
+                    <p class="text-xs text-slate-400 mb-4 leading-relaxed">${product.desc}</p>
+                    <div class="text-cyan-400 font-extrabold text-xl mb-6">${formatPrice(product.price)}</div>
+                    <button onclick="addToCart(${product.id}); closeProductModal();" class="w-full bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold py-3 rounded-xl transition-all">
+                        Savatchaga qo'shish
+                    </button>
+                </div>
+            `;
+            document.getElementById('productModal').classList.remove('hidden');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.add('hidden');
         }
 
         function renderProducts(items) {
@@ -246,10 +319,10 @@
                 grid.innerHTML += `
                     <div class="bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden hover:border-cyan-500/50 transition-all duration-300 group flex flex-col justify-between shadow-xl">
                         <div>
-                            <div class="relative overflow-hidden bg-slate-950 h-60 flex items-center justify-center">
+                            <div class="relative overflow-hidden bg-slate-950 h-60 flex items-center justify-center cursor-pointer" onclick="openProductModal(${product.id})">
                                 <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90">
                                 
-                                <button onclick="toggleWishlist(${product.id})" class="absolute top-4 left-4 p-2 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700 text-slate-300 hover:text-red-500 transition-colors">
+                                <button onclick="event.stopPropagation(); toggleWishlist(${product.id})" class="absolute top-4 left-4 p-2 rounded-xl bg-slate-900/80 backdrop-blur-md border border-slate-700 text-slate-300 hover:text-red-500 transition-colors">
                                     <svg class="w-4 h-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                                 </button>
 
@@ -258,7 +331,7 @@
                                 </div>
                             </div>
                             <div class="p-6">
-                                <h3 class="font-bold text-base text-slate-100 mb-2 line-clamp-1">${product.name}</h3>
+                                <h3 class="font-bold text-base text-slate-100 mb-2 line-clamp-1 cursor-pointer hover:text-cyan-400 transition-colors" onclick="openProductModal(${product.id})">${product.name}</h3>
                                 <div class="text-cyan-400 font-extrabold text-lg">${formatPrice(product.price)}</div>
                             </div>
                         </div>
@@ -273,24 +346,38 @@
             });
         }
 
-        function filterCategory(category) {
+        function filterCategory(category, btn) {
             currentCategory = category;
-            document.querySelectorAll('.cat-btn').forEach(btn => {
-                btn.className = "cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all";
+            showOnlyWishlist = false;
+            document.querySelectorAll('.cat-btn').forEach(b => {
+                b.className = "cat-btn bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-semibold px-4 py-2.5 rounded-xl transition-all";
             });
-            event.target.className = "cat-btn bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-cyan-500/10";
+            if (btn) btn.className = "cat-btn bg-cyan-500 text-slate-950 text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-md shadow-cyan-500/10";
             applyFilters();
         }
 
         function applyFilters() {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            let filtered = products;
+            const sortVal = document.getElementById('sortSelect').value;
+            let filtered = [...products];
 
-            if (currentCategory !== 'all') {
+            if (showOnlyWishlist) {
+                filtered = filtered.filter(p => wishlist.includes(p.id));
+            } else if (currentCategory !== 'all') {
                 filtered = filtered.filter(p => p.category === currentCategory);
             }
+
             if (query) {
                 filtered = filtered.filter(p => p.name.toLowerCase().includes(query));
+            }
+
+            // Saralash
+            if (sortVal === 'price-asc') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortVal === 'price-desc') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortVal === 'rating') {
+                filtered.sort((a, b) => b.rating - a.rating);
             }
 
             renderProducts(filtered);
@@ -395,19 +482,20 @@
             const name = document.getElementById('custName').value;
             const phone = document.getElementById('custPhone').value;
             const address = document.getElementById('custAddress').value;
+            const payment = document.getElementById('paymentType').value;
             const total = formatPrice(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0));
 
-            alert(`✅ Rahmat ${name}!\n\nBuyurtmangiz qabul qilindi.\n💰 Umumiy summa: ${total}\n📍 Manzil: ${address}\n\nTez orada ${phone} raqamingizga bog'lanamiz.`);
+            alert(`✅ Rahmat ${name}!\n\nBuyurtmangiz qabul qilindi.\n💰 Summa: ${total}\n💳 To'lov: ${payment}\n📍 Manzil: ${address}\n\nTez orada ${phone} raqamingizga bog'lanamiz.`);
 
             cart = [];
             saveAndSyncCart();
             closeCheckoutModal();
         }
 
+        // Boshlang'ich yuklash
         renderProducts(products);
         updateCartUI();
+        updateWishlistUI();
     </script>
 </body>
 </html>
-
-              
